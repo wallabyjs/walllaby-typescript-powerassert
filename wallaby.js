@@ -27,27 +27,27 @@ module.exports = function () {
 
 
     // This is not required for power-assert to work in wallaby,
-    // it's just to make it look a bit prettier,
-    // see https://github.com/power-assert-js/power-assert#customization-api
+    // it's just to make inline messages better
 
     setup: function () {
-
-      var customPowerAssert = require('power-assert').customize({
-        output: {
-          renderers: [
-            './built-in/assertion',
-            './built-in/diagram',
-            './built-in/binary-expression'
-          ]
-        }
-      });
-
       var Module = require('module').Module;
       if (!Module._originalRequire) {
         const modulePrototype = Module.prototype;
         Module._originalRequire = modulePrototype.require;
         modulePrototype.require = function (filePath) {
-          if (filePath === 'power-assert') return customPowerAssert;
+          if (filePath === 'empower-core') {
+            var originalEmpowerCore = Module._originalRequire.call(this, filePath);
+            var newEmpowerCore = function () {
+              var originalOnError = arguments[1].onError;
+              arguments[1].onError = function (errorEvent) {
+                errorEvent.originalMessage = errorEvent.error.message + '\n';
+                return originalOnError.apply(this, arguments);
+              };
+              return originalEmpowerCore.apply(this, arguments);
+            };
+            newEmpowerCore.defaultOptions = originalEmpowerCore.defaultOptions;
+            return newEmpowerCore;
+          }
           return Module._originalRequire.call(this, filePath);
         };
       }
