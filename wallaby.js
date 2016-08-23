@@ -17,7 +17,7 @@ module.exports = function () {
     // https://wallabyjs.com/docs/integration/es-next.html
 
     preprocessors: {
-      '**/*.js': file => require('babel-core').transform(
+      '**/*.unit.js': file => require('babel-core').transform(
         file.content,
         {
           filename: file.path,
