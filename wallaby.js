@@ -17,12 +17,19 @@ module.exports = function () {
     // https://wallabyjs.com/docs/integration/es-next.html
 
     preprocessors: {
-      '**/*.unit.js': file => require('babel-core').transform(
-        file.content.replace('(\'assert\')', '(\'power-assert\')'),
-        {
-          filename: file.path,
-          sourceMap: true, presets: ['babel-preset-power-assert']
-        })
+      '**/*.unit.js': file => {
+        var getSourceMapFromDataUrl = function (code) {
+          const sourceMapCommentRegEx = /\/\/[@#] sourceMappingURL=data:application\/json(?:;charset[:=][^;]+)?;base64,(.*)\n/;
+          const match = code.match(sourceMapCommentRegEx);
+          const sourceMapBase64 = match[1];
+          return JSON.parse(new Buffer(sourceMapBase64, 'base64').toString());
+        };
+        var transformedCode = require('espower-source')(
+          file.content.replace('(\'assert\')', '(\'power-assert\')'),
+          file.path);
+
+        return {code: transformedCode, sourceMap: getSourceMapFromDataUrl(transformedCode)};
+      }
     },
 
 
