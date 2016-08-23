@@ -13,12 +13,12 @@ module.exports = function () {
       type: 'node'
     },
 
-    // for ES code (not TypeScript) babel compiler should be used
+    // for ES code (not TypeScript) babel compiler should be used instead,
     // https://wallabyjs.com/docs/integration/es-next.html
 
     preprocessors: {
       '**/*.unit.js': file => require('babel-core').transform(
-        file.content,
+        file.content.replace('(\'assert\')', '(\'power-assert\')'),
         {
           filename: file.path,
           sourceMap: true, presets: ['babel-preset-power-assert']

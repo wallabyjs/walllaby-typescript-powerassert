@@ -1,6 +1,6 @@
 import Greeter from './greeter';
 
-var assert = require('power-assert');
+var assert = require('assert');
 
 describe('Sayings Greeter', () => {
     it('should greet', () => {
